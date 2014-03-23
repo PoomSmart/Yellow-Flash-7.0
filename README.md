@@ -1,16 +1,11 @@
-HDR Badge 7.0
+Yellow Flash 7.0
 ==========
 
-Fulfill the incompleted HDR badge done by Apple in iOS 7.0
+Highlight Flash button in Camera app like iOS 7.1 for iOS 7.0
 
-Comparision
+How it work ?
 ==========
 
-Without HDR Badge
+Notice the Flash Button...
 
-![alt tag](https://raw.github.com/PoomSmart/HDRBadge70/master/OFF.PNG)
-
-
-With HDR Badge
-
-![alt tag](https://raw.github.com/PoomSmart/HDRBadge70/master/ON.PNG)
+![alt tag](https://raw.github.com/PoomSmart/Yellow-Flash-7.0/master/IMG_0324.PNG)
