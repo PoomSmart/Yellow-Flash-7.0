@@ -1,0 +1,8 @@
+Package: org.thebigboss.flashyellow70
+Name: Yellow Flash 7.0
+Depends: mobilesubstrate, firmware (>= 7.0), firmware (<< 7.1), gsc.camera-flash | org.thebigboss.frontflash
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Highlight Flash button in Camera app like iOS 7.1
+Author: PoomSmart
+Section: Tweaks
