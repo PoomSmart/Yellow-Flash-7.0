@@ -9,3 +9,5 @@ How it work ?
 Notice the Flash Button...
 
 ![alt tag](https://raw.github.com/PoomSmart/Yellow-Flash-7.0/master/SS.PNG)
+
+MIT License.

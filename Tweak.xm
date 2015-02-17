@@ -1,63 +1,14 @@
-#import <Foundation/Foundation.h>
+#import "../PS.h"
 
 @interface CAMFlashBadge : UIButton
-@end
-
-@interface UIColor (FlashYellow70Addition)
-+ (UIColor *)systemYellowColor;
-@end
-
-@interface UIImage (FlashYellow70Addition)
-+ (UIImage *)imageNamed:(NSString *)name inBundle:(NSBundle *)bundle;
-- (UIImage *)_flatImageWithColor:(UIColor *)color;
-@end
-
-@interface UIView (FlashYellow70Addition)
-+ (NSTimeInterval)pl_setHiddenAnimationDuration;
-- (void)pl_setHidden:(BOOL)hidden animated:(BOOL)animated;
-@end
-
-@interface PLCameraView : UIView
-- (int)cameraMode;
-- (int)_currentFlashMode;
-- (BOOL)_shouldHideFlashButtonForMode:(int)mode;
-- (BOOL)_isStillImageMode:(int)mode;
-- (BOOL)_isVideoMode:(int)mode;
-- (BOOL)_isHidingBadgesForFilterUI;
-@end
-
-@interface PLCameraEffectsRenderer : NSObject
-@property(assign, nonatomic, getter=isShowingGrid) BOOL showGrid;
-@end
-
-@interface PLCameraController : NSObject
-@property(assign, nonatomic) BOOL performingTimedCapture;
-@property(retain) PLCameraEffectsRenderer *effectsRenderer;
-+ (PLCameraController *)sharedInstance;
-- (PLCameraView *)delegate;
-- (int)flashMode;
-- (BOOL)flashWillFire;
 @end
 
 @interface PLCameraView (FlashYellow70Addition)
 - (CAMFlashBadge *)_flashBadge;
 - (id)_HDRBadge;
-- (BOOL)_shouldHideFlashBadgeForMode:(int)mode;
+- (BOOL)_shouldHideFlashBadgeForMode:(NSInteger)mode;
 - (void)_70_updateFlashBadge;
 - (void)_createFlashBadgeIfNecessary;
-@end
-
-@interface CAMButtonLabel : UILabel
-@end
-
-@interface CAMFlashButton : UIButton
-@property(assign, nonatomic) int flashMode;
-@property(assign, nonatomic) int orientation;
-@property(readonly, assign, nonatomic) CAMButtonLabel *_offLabel;
-@property(readonly, assign, nonatomic) CAMButtonLabel *_onLabel;
-@property(readonly, assign, nonatomic) CAMButtonLabel *_autoLabel;
-@property(readonly, assign, nonatomic) UIImageView *_flashIconView;
-- (BOOL)isExpanded;
 @end
 
 @interface CAMFlashButton (FlashYellow70Addition)
@@ -118,19 +69,19 @@ static CAMFlashBadge *flashBadge = nil;
 %hook PLCameraView
 
 %new
-- (BOOL)_shouldHideFlashBadgeForMode:(int)mode
+- (BOOL)_shouldHideFlashBadgeForMode:(NSInteger)mode
 {
 	PLCameraController *cont = [%c(PLCameraController) sharedInstance];
 	BOOL performingTimedCapture = [cont performingTimedCapture];
-	int currentFlashMode = [self _currentFlashMode];
+	NSInteger currentFlashMode = [self _currentFlashMode];
 	if (!performingTimedCapture && currentFlashMode == 0) {
-		int cameraMode = [self cameraMode];
+		NSInteger cameraMode = self.cameraMode;
 		BOOL isStillImageMode = [self _isStillImageMode:cameraMode];
 		BOOL isVideoMode = [self _isVideoMode:cameraMode];
 		BOOL shouldHideFlashButton = [self _shouldHideFlashButtonForMode:mode];
 		BOOL isShowingGrid = [cont.effectsRenderer isShowingGrid];
 		BOOL isReviewing = MSHookIvar<BOOL>(self, "_reviewingImagePickerCapture");
-		int flashMode = [cont flashMode];
+		NSInteger flashMode = cont.flashMode;
 		if (isStillImageMode) {
 			BOOL flashWillFire = [cont flashWillFire];
 			if (flashWillFire) {
@@ -155,9 +106,9 @@ static CAMFlashBadge *flashBadge = nil;
 %new
 - (void)_70_updateFlashBadge
 {
-	BOOL hidden = [self _shouldHideFlashBadgeForMode:[self cameraMode]];
+	BOOL hidden = [self _shouldHideFlashBadgeForMode:self.cameraMode];
 	[UIView animateWithDuration:[UIView pl_setHiddenAnimationDuration] animations:^{
-		flashBadge.alpha = hidden ? 0 : 1;
+		flashBadge.alpha = hidden ? 0.0f : 1.0f;
 	}];
 }
 
@@ -168,7 +119,7 @@ static CAMFlashBadge *flashBadge = nil;
 	flashBadge.tag = 5454;
 	flashBadge.enabled = YES;
 	flashBadge.userInteractionEnabled = NO;
-	flashBadge.frame = [[self _HDRBadge] frame];
+	flashBadge.frame = [self _HDRBadge].frame;
 	if ([self viewWithTag:5454] != nil) {
 		[[self viewWithTag:5454] removeFromSuperview];
 		[[self viewWithTag:5454] release];
@@ -177,7 +128,7 @@ static CAMFlashBadge *flashBadge = nil;
 	[self _70_updateFlashBadge];
 }
 
-- (void)setCameraMode:(int)mode
+- (void)setCameraMode:(NSInteger)mode
 {
 	%orig;
 	if (!MSHookIvar<BOOL>(self, "_capturingPhoto"))
@@ -190,13 +141,13 @@ static CAMFlashBadge *flashBadge = nil;
 	[self _70_updateFlashBadge];
 }
 
-- (void)setVideoFlashMode:(int)mode
+- (void)setVideoFlashMode:(NSInteger)mode
 {
 	%orig;
 	[self _70_updateFlashBadge];
 }
 
-- (void)_setFlashMode:(int)mode
+- (void)_setFlashMode:(NSInteger)mode
 {
 	%orig;
 	[self _70_updateFlashBadge];
@@ -225,13 +176,13 @@ static CAMFlashBadge *flashBadge = nil;
 	%orig;
 }
 
-- (void)_showControlsForChangeToMode:(int)mode animated:(BOOL)animated
+- (void)_showControlsForChangeToMode:(NSInteger)mode animated:(BOOL)animated
 {
 	%orig;
 	[self _70_updateFlashBadge];
 }
 
-- (void)_hideControlsForChangeToMode:(int)mode animated:(BOOL)animated
+- (void)_hideControlsForChangeToMode:(NSInteger)mode animated:(BOOL)animated
 {
 	%orig;
 	[self _70_updateFlashBadge];
@@ -265,7 +216,7 @@ static CAMFlashBadge *flashBadge = nil;
 	[self _70_updateColors];
 }
 
-- (void)setFlashMode:(int)mode notifyDelegate:(BOOL)delegate
+- (void)setFlashMode:(NSInteger)mode notifyDelegate:(BOOL)delegate
 {
 	%orig;
 	if (![self isExpanded])
@@ -273,7 +224,7 @@ static CAMFlashBadge *flashBadge = nil;
 	[[[%c(PLCameraController) sharedInstance] delegate] _70_updateFlashBadge];
 }
 
-- (void)setOrientation:(int)orientation animated:(BOOL)animated
+- (void)setOrientation:(NSInteger)orientation animated:(BOOL)animated
 {
 	%orig;
 	[self _70_updateColors];
